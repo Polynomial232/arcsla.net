@@ -140,12 +140,6 @@ const SectionHeader = ({ title, subtitle, icon: Icon }: { title: string, subtitl
 );
 
 export default function Home() {
-    const donateRef = useRef<HTMLElement>(null);
-    const { scrollYProgress: donateScroll } = useScroll({
-        target: donateRef,
-        offset: ["start end", "end start"]
-    });
-    const donateY = useTransform(donateScroll, [0, 1], ["-20%", "20%"]);
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-accent-yellow selection:text-deep-purple">
             {/* Background Layers */}

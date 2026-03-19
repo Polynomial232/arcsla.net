@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Crown, Mail, Instagram, Twitter, Linkedin, Palette, Award, Shield, Sparkles, Youtube, Heart } from "lucide-react";
+import { ArrowLeft, Crown, Instagram, Twitter, Linkedin, Palette, Award, Shield, Sparkles, Youtube, Heart } from "lucide-react";
 import { TALENTS } from "../data";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 

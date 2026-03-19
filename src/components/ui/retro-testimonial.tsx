@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ===== Types and Interfaces =====
@@ -51,28 +50,6 @@ const Carousel = ({ items }: iCarouselProps) => {
         window.addEventListener("resize", updateWidth);
         return () => window.removeEventListener("resize", updateWidth);
     }, [items, x]);
-
-    const handleNext = () => {
-        let currentX = x.get();
-        let nextX = currentX - 400;
-
-        // Loop boundary check
-        if (nextX <= -(itemWidth * 2)) {
-            nextX += itemWidth;
-        }
-        x.set(nextX);
-    };
-
-    const handlePrev = () => {
-        let currentX = x.get();
-        let nextX = currentX + 400;
-
-        // Loop boundary check
-        if (nextX >= 0) {
-            nextX -= itemWidth;
-        }
-        x.set(nextX);
-    };
 
     // Relative Drag Logic (Fixes snapping back during infinite drag)
     const handleDrag = (_: any, info: { delta: { x: number } }) => {
@@ -143,11 +120,9 @@ const Carousel = ({ items }: iCarouselProps) => {
 const TestimonialCard = ({
     testimonial,
     index,
-    backgroundImage = "https://i.imgur.com/1Z3MVNG.jpeg",
 }: {
     testimonial: iTestimonial;
     index: number;
-    backgroundImage?: string;
 }) => {
     return (
         <div

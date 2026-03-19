@@ -4,24 +4,15 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import {
     Youtube,
-    Music,
     Sword,
-    Shield,
-    Award,
     Users,
     Calendar,
-    Zap,
     TrendingUp,
-    ArrowRight,
     Disc,
-    Code,
-    Sparkles,
-    Target,
-    Palette,
-    Crown,
-    Play
+    Play,
+    Sparkles
 } from "lucide-react"
-import { motion, useScroll, useTransform, useInView, useSpring } from "framer-motion"
+import { motion, useScroll, useTransform, useInView, useSpring, type Variants } from "framer-motion"
 import { cn } from "@/lib/utils"
 import fortressImg from '@/assets/fanart/Kaira_Feeds-2.webp'; // Moved to top
 
@@ -42,7 +33,7 @@ export default function AboutUsSection() {
     const rotate1 = useTransform(scrollYProgress, [0, 1], [0, 20])
     const rotate2 = useTransform(scrollYProgress, [0, 1], [0, -20])
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -53,7 +44,7 @@ export default function AboutUsSection() {
         },
     }
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
             y: 0,
@@ -163,7 +154,7 @@ export default function AboutUsSection() {
                                     icon={service.icon}
                                     title={service.title}
                                     description={service.description}
-                                    variants={itemVariants as any}
+                                    variants={itemVariants}
                                     delay={index * 0.2}
                                     direction="left"
                                 />
@@ -251,7 +242,7 @@ export default function AboutUsSection() {
                                     icon={service.icon}
                                     title={service.title}
                                     description={service.description}
-                                    variants={itemVariants as any}
+                                    variants={itemVariants}
                                     delay={index * 0.2}
                                     direction="right"
                                 />
@@ -275,11 +266,8 @@ export default function AboutUsSection() {
                             label={stat.label}
                             suffix={stat.suffix}
                             delay={index * 0.1}
-                            // @ts-ignore
                             isFloat={stat.isFloat}
-                            // @ts-ignore
                             useLocale={stat.useLocale}
-                            // @ts-ignore
                             stringValue={stat.stringValue}
                         />
                     ))}
@@ -294,7 +282,7 @@ interface ServiceItemProps {
     icon: React.ReactNode
     title: string
     description: string
-    variants: any
+    variants: Variants
     delay: number
     direction: "left" | "right"
 }
@@ -390,7 +378,7 @@ function StatCounter({ icon, value, label, suffix, delay, isFloat, useLocale, st
                     y: 0,
                     transition: { duration: 0.6, delay },
                 },
-            } as any}
+            } as Variants}
             whileHover={{ y: -10, transition: { duration: 0.3 } }}
         >
             <motion.div
