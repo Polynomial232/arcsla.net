@@ -1,8 +1,8 @@
-"use client";
-
 import { useState } from 'react';
-import { FaLinkedinIn, FaTwitter, FaBehance, FaInstagram } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaLinkedinIn, FaTwitter, FaBehance, FaInstagram, FaYoutube, FaHeart } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
+import { TALENTS } from '../../data';
 
 export interface TeamMember {
     id: string;
@@ -14,60 +14,22 @@ export interface TeamMember {
         linkedin?: string;
         instagram?: string;
         behance?: string;
+        youtube?: string;
+        sociabuzz?: string;
     };
 }
-
-const DEFAULT_MEMBERS: TeamMember[] = [
-    {
-        id: '1',
-        name: 'Chadrack',
-        role: 'director of photography',
-        image: 'https://media.licdn.com/dms/image/v2/D4D03AQFnmLdpZW78yA/profile-displayphoto-scale_200_200/B4DZvM8NB2JMAY-/0/1768669895649?e=2147483647&v=beta&t=5VGAB-2gYupLNaHvJHECollR25THd-3oR5wngGlQiY4',
-        social: { twitter: '#', linkedin: '#', behance: '#' },
-    },
-    {
-        id: '2',
-        name: 'Mak VieSAinte',
-        role: 'FOUNDER',
-        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS2vnSxNNVGZV2MXRjlGELl-NgLl5kXdpDR6A&s',
-        social: { twitter: '#', linkedin: '#' },
-    },
-    {
-        id: '3',
-        name: 'Osiris Balonga',
-        role: 'LEAD FRONT-END',
-        image: 'https://media.licdn.com/dms/image/v2/D4D03AQGVqrPPAGHtoQ/profile-displayphoto-scale_200_200/B4DZwhAkjaHwAY-/0/1770080338529?e=2147483647&v=beta&t=q-_6p1VCJ8NN8eHj9zUFwJZds_XpKez9Hy14SAIDp4M',
-        social: { twitter: '#', linkedin: '#' },
-    },
-    {
-        id: '4',
-        name: 'Jacques',
-        role: 'PRODUCT OWNER',
-        image: 'https://media.licdn.com/dms/image/v2/D4D03AQE-Z7-S1LSYNQ/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1724143166545?e=2147483647&v=beta&t=6IPCwgOzblGt4p2fEdnY74gMbLyRHii5Ite3A39qQsY',
-        social: { linkedin: '#' },
-    },
-    {
-        id: '5',
-        name: 'Riche Makso',
-        role: 'CTO - PRODUCT DESIGNER',
-        image: 'https://media.licdn.com/dms/image/v2/D4D03AQEkTAbZLlSrLg/profile-displayphoto-scale_200_200/B4DZoHdu8BGgAY-/0/1761061833315?e=2147483647&v=beta&t=Rg1dBTvq9X2heyhuhBwG2DsEkG65v0vQ35hF2FSeYns',
-        social: { twitter: '#', linkedin: '#' },
-    },
-    {
-        id: '6',
-        name: 'Jemima',
-        role: 'MAKE-UP ARTISTE',
-        image: 'https://i.pravatar.cc/400?img=16',
-        social: { instagram: '#' },
-    },
-];
 
 interface TeamShowcaseProps {
     members?: TeamMember[];
 }
 
-export default function TeamShowcase({ members = DEFAULT_MEMBERS }: TeamShowcaseProps) {
+export default function TeamShowcase({ members = TALENTS }: TeamShowcaseProps) {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
+    const navigate = useNavigate();
+
+    const handleMemberClick = (id: string) => {
+        navigate(`/talent/${id}`);
+    };
 
     const col1 = members.filter((_, i) => i % 3 === 0);
     const col2 = members.filter((_, i) => i % 3 === 1);
@@ -86,6 +48,7 @@ export default function TeamShowcase({ members = DEFAULT_MEMBERS }: TeamShowcase
                             className="w-[110px] h-[120px] sm:w-[130px] sm:h-[140px] md:w-[155px] md:h-[165px]"
                             hoveredId={hoveredId}
                             onHover={setHoveredId}
+                            onClick={() => handleMemberClick(member.id)}
                         />
                     ))}
                 </div>
@@ -99,6 +62,7 @@ export default function TeamShowcase({ members = DEFAULT_MEMBERS }: TeamShowcase
                             className="w-[122px] h-[132px] sm:w-[145px] sm:h-[155px] md:w-[172px] md:h-[182px]"
                             hoveredId={hoveredId}
                             onHover={setHoveredId}
+                            onClick={() => handleMemberClick(member.id)}
                         />
                     ))}
                 </div>
@@ -112,6 +76,7 @@ export default function TeamShowcase({ members = DEFAULT_MEMBERS }: TeamShowcase
                             className="w-[115px] h-[125px] sm:w-[136px] sm:h-[146px] md:w-[162px] md:h-[172px]"
                             hoveredId={hoveredId}
                             onHover={setHoveredId}
+                            onClick={() => handleMemberClick(member.id)}
                         />
                     ))}
                 </div>
@@ -125,6 +90,7 @@ export default function TeamShowcase({ members = DEFAULT_MEMBERS }: TeamShowcase
                         member={member}
                         hoveredId={hoveredId}
                         onHover={setHoveredId}
+                        onClick={() => handleMemberClick(member.id)}
                     />
                 ))}
             </div>
@@ -141,11 +107,13 @@ function PhotoCard({
     className,
     hoveredId,
     onHover,
+    onClick,
 }: {
     member: TeamMember;
     className: string;
     hoveredId: string | null;
     onHover: (id: string | null) => void;
+    onClick?: () => void;
 }) {
     const isActive = hoveredId === member.id;
     const isDimmed = hoveredId !== null && !isActive;
@@ -159,6 +127,7 @@ function PhotoCard({
             )}
             onMouseEnter={() => onHover(member.id)}
             onMouseLeave={() => onHover(null)}
+            onClick={onClick}
         >
             <img
                 src={member.image}
@@ -180,15 +149,17 @@ function MemberRow({
     member,
     hoveredId,
     onHover,
+    onClick,
 }: {
     member: TeamMember;
     hoveredId: string | null;
     onHover: (id: string | null) => void;
+    onClick?: () => void;
 }) {
     const isActive = hoveredId === member.id;
     const isDimmed = hoveredId !== null && !isActive;
     // @ts-ignore
-    const hasSocial = member.social?.twitter ?? member.social?.linkedin ?? member.social?.instagram ?? member.social?.behance;
+    const hasSocial = member.social?.twitter || member.social?.linkedin || member.social?.instagram || member.social?.behance || member.social?.youtube || member.social?.sociabuzz;
 
     return (
         <div
@@ -199,6 +170,7 @@ function MemberRow({
             )}
             onMouseEnter={() => onHover(member.id)}
             onMouseLeave={() => onHover(null)}
+            onClick={onClick}
         >
             {/* Name + social*/}
             <div className="flex items-center gap-2.5">
@@ -267,6 +239,30 @@ function MemberRow({
                                 title="Behance"
                             >
                                 <FaBehance size={10} />
+                            </a>
+                        )}
+                        {member.social?.youtube && (
+                            <a
+                                href={member.social.youtube}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 rounded text-deep-purple hover:text-accent-yellow transition-all duration-150 hover:scale-110"
+                                title="YouTube"
+                            >
+                                <FaYoutube size={10} />
+                            </a>
+                        )}
+                        {member.social?.sociabuzz && (
+                            <a
+                                href={member.social.sociabuzz}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="p-1 rounded text-deep-purple hover:text-accent-yellow transition-all duration-150 hover:scale-110"
+                                title="Sociabuzz"
+                            >
+                                <FaHeart size={10} />
                             </a>
                         )}
                     </div>

@@ -15,10 +15,15 @@ import {
     ArrowRight,
     Disc,
     Code,
-    Sparkles
+    Sparkles,
+    Target,
+    Palette,
+    Crown,
+    Play
 } from "lucide-react"
 import { motion, useScroll, useTransform, useInView, useSpring } from "framer-motion"
 import { cn } from "@/lib/utils"
+import fortressImg from '@/assets/fanart/Kaira_Feeds-2.webp'; // Moved to top
 
 export default function AboutUsSection() {
     const sectionRef = useRef<HTMLDivElement>(null)
@@ -60,53 +65,23 @@ export default function AboutUsSection() {
     const services = [
         {
             icon: <Youtube className="w-6 h-6" />,
-            title: "YouTube Scaling",
-            description:
-                "Mastering algorithms to catapult your channel into the royal ranks of digital influence.",
-            position: "left",
-        },
-        {
-            icon: <Music className="w-6 h-6" />,
-            title: "Music Distro",
-            description:
-                "Spreading your compositions across all global realms, ensuring your voice echoes through the halls.",
-            position: "left",
-        },
-        {
-            icon: <Code className="w-6 h-6" />,
-            title: "Web Platforms",
-            description:
-                "Building unshakeable digital fortresses tailored to your sovereign brand identity.",
+            title: "YouTube Video",
+            description: "",
             position: "left",
         },
         {
             icon: <Disc className="w-6 h-6" />,
             title: "Music Production",
-            description:
-                "Crafting professional soundscapes that define the auditory signature of your empire.",
-            position: "right",
-        },
-        {
-            icon: <Shield className="w-6 h-6" />,
-            title: "Brand Protection",
-            description:
-                "Guarding your domain and digital assets with the vigilance of the elite knights.",
-            position: "right",
-        },
-        {
-            icon: <Zap className="w-6 h-6" />,
-            title: "Growth Strategy",
-            description:
-                "Meticulous combat plans for market conquest, focusing on retention and expansion.",
+            description: "",
             position: "right",
         },
     ]
 
     const stats = [
-        { icon: <Award className="w-6 h-6" />, value: 250, label: "Campaigns Won", suffix: "+" },
-        { icon: <Users className="w-6 h-6" />, value: 50, label: "Sovereign Clients", suffix: "M+" },
-        { icon: <Calendar className="w-6 h-6" />, value: 10, label: "Years Reigned", suffix: "" },
-        { icon: <TrendingUp className="w-6 h-6" />, value: 99, label: "Loyalty Rate", suffix: "%" },
+        { icon: <Users className="w-6 h-6" />, value: 17100, label: "Subscribers", suffix: "K", stringValue: "17K+", isFloat: true },
+        { icon: <TrendingUp className="w-6 h-6" />, value: 706319, label: "Total Views", suffix: "", stringValue: "700,000+", useLocale: true },
+        { icon: <Play className="w-6 h-6" />, value: 900, label: "Videos", suffix: "", stringValue: "900+" },
+        { icon: <Calendar className="w-6 h-6" />, value: 0, label: "Created On", suffix: "", stringValue: "Feb 20, 2014" },
     ]
 
     return (
@@ -206,25 +181,11 @@ export default function AboutUsSection() {
                                 whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
                             >
                                 <img
-                                    src="https://i.imgur.com/1Z3MVNG.jpeg"
+                                    src={fortressImg}
                                     alt="ARCSLA Fortress"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-deep-purple/60 via-transparent to-transparent" />
-                                <motion.div
-                                    className="absolute inset-0 flex items-end justify-center p-6"
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                                    transition={{ duration: 0.8, delay: 0.9 }}
-                                >
-                                    <motion.button
-                                        className="bg-white text-deep-purple px-6 py-3 rounded-full flex items-center gap-2 text-sm font-black uppercase tracking-widest shadow-xl"
-                                        whileHover={{ scale: 1.05, backgroundColor: "#000", color: "#fff" }}
-                                        whileTap={{ scale: 0.95 }}
-                                    >
-                                        View Archives <ArrowRight className="w-4 h-4" />
-                                    </motion.button>
-                                </motion.div>
                             </motion.div>
 
                             {/* Inner border flourish from example */}
@@ -314,6 +275,12 @@ export default function AboutUsSection() {
                             label={stat.label}
                             suffix={stat.suffix}
                             delay={index * 0.1}
+                            // @ts-ignore
+                            isFloat={stat.isFloat}
+                            // @ts-ignore
+                            useLocale={stat.useLocale}
+                            // @ts-ignore
+                            stringValue={stat.stringValue}
                         />
                     ))}
                 </motion.div>
@@ -370,16 +337,6 @@ function ServiceItem({ icon, title, description, variants, delay, direction }: S
             >
                 {description}
             </motion.p>
-            <motion.div
-                className={cn(
-                    "mt-3 flex items-center text-accent-purple text-xs font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-                    direction === "right" ? "md:justify-end" : ""
-                )}
-            >
-                <span className="flex items-center gap-1">
-                    Enlist Now <ArrowRight className="w-3 h-3" />
-                </span>
-            </motion.div>
         </motion.div>
     )
 }
@@ -390,9 +347,12 @@ interface StatCounterProps {
     label: string
     suffix: string
     delay: number
+    isFloat?: boolean
+    useLocale?: boolean
+    stringValue?: string
 }
 
-function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
+function StatCounter({ icon, value, label, suffix, delay, isFloat, useLocale, stringValue }: StatCounterProps) {
     const countRef = useRef(null)
     const isInView = useInView(countRef, { once: false })
     const [hasAnimated, setHasAnimated] = useState(false)
@@ -414,7 +374,11 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
         }
     }, [isInView, value, springValue, hasAnimated])
 
-    const displayValue = useTransform(springValue, (latest) => Math.floor(latest))
+    const displayValue = useTransform(springValue, (latest) => {
+        if (isFloat) return latest.toFixed(1)
+        if (useLocale) return Math.floor(latest).toLocaleString()
+        return Math.floor(latest)
+    })
 
     return (
         <motion.div
@@ -436,8 +400,14 @@ function StatCounter({ icon, value, label, suffix, delay }: StatCounterProps) {
                 {icon}
             </motion.div>
             <motion.div ref={countRef} className="text-4xl font-black text-deep-purple flex items-center tracking-tighter">
-                <motion.span>{displayValue}</motion.span>
-                <span>{suffix}</span>
+                {stringValue ? (
+                    <motion.span className="text-2xl whitespace-nowrap">{stringValue}</motion.span>
+                ) : (
+                    <>
+                        <motion.span>{displayValue as any}</motion.span>
+                        <span>{suffix}</span>
+                    </>
+                )}
             </motion.div>
             <p className="text-deep-purple/70 text-xs font-bold uppercase tracking-widest mt-2">{label}</p>
             <motion.div className="w-10 h-1 bg-accent-yellow mt-4 group-hover:w-20 transition-all duration-500 rounded-full" />

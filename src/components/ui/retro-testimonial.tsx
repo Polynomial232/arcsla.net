@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 
 // ===== Types and Interfaces =====
 export interface iTestimonial {
+    id?: string;
+    username?: string;
     name: string;
     designation: string;
     description: string;
@@ -157,8 +159,9 @@ const TestimonialCard = ({
             <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <img
                     className="w-full h-full object-cover"
-                    src={backgroundImage}
+                    src={testimonial.profileImage}
                     alt="Background layer"
+                    draggable={false}
                 />
             </div>
 
@@ -169,9 +172,20 @@ const TestimonialCard = ({
                     "{testimonial.description}"
                 </p>
                 <div className="space-y-1">
-                    <p className="text-deep-purple text-2xl font-black text-center lowercase">
+                    <p className="text-deep-purple text-2xl font-black text-center capitalize">
                         {testimonial.name}
                     </p>
+                    {testimonial.username && testimonial.id && (
+                        <a
+                            href={`https://discord.com/users/${testimonial.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-accent-purple/60 text-sm font-bold text-center block hover:text-deep-purple transition-colors mb-1 relative z-50 pointer-events-auto"
+                            onPointerDown={(e) => e.stopPropagation()}
+                        >
+                            @{testimonial.username}
+                        </a>
+                    )}
                     <p className="text-accent-purple text-sm font-bold text-center uppercase tracking-widest underline underline-offset-4 decoration-accent-yellow">
                         {testimonial.designation}
                     </p>
@@ -180,7 +194,6 @@ const TestimonialCard = ({
         </div>
     );
 };
-
 const ProfileImage = ({ src, alt, className }: { src: string; alt?: string; className?: string }) => {
     const [isLoading, setLoading] = useState(true);
 
@@ -196,6 +209,7 @@ const ProfileImage = ({ src, alt, className }: { src: string; alt?: string; clas
                 )}
                 onLoad={() => setLoading(false)}
                 src={src}
+                draggable={false}
                 loading="lazy"
                 alt={alt || "Profile image"}
             />
