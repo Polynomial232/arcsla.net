@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Geist+Mono:wght@100..900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #fafafa;
+  /* default to off-white based on user's new colors */
+  --foreground: #6b21a8;
+  /* default to deep purple for contrast */
+  --font-plus-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plus-jakarta);
+  --font-mono: var(--font-geist-mono);
+
+  --color-pastel-yellow: #fef9c3;
+  --color-accent-yellow: #fde047;
+  --color-pastel-purple: #f3e8ff;
+  --color-accent-purple: #d8b4fe;
+  --color-deep-purple: #6b21a8;
+  --color-off-white: #fafafa;
+
+  /* Retaining some royal mapping if needed, but primarily following user's new palette */
+  --color-primary: #fde047;
+  --color-secondary: #d8b4fe;
+  --color-accent: #6b21a8;
+  --color-border: #e5e7eb;
+}
+
+@layer base {
+
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply tracking-tighter;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar using new colors */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-off-white;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-accent-yellow);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-deep-purple);
+}
