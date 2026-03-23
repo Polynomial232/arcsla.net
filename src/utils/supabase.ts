@@ -12,7 +12,7 @@ export const getStorageUrl = (bucket: string, path: string | null) => {
     return `${supabaseUrl}/storage/v1/object/public/${bucket}/${cleanPath}`;
 };
 export const preloadImage = (url: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         if (!url) {
             resolve();
             return;
