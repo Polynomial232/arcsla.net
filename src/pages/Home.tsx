@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Menu, X, Crown, Youtube, Music, Heart, Disc, Share2, Palette, ArrowRight } from "lucide-react";
+import { Menu, X, Crown, Youtube, Music, Heart, Disc, Share2, Palette, ArrowRight, Calendar, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV_LINKS, TEAM_MEMBERS, TALENTS, YOUTUBE_VIDEOS, FANART_ITEMS, SOCIAL_LINKS } from "../data";
 import { ShuffleHero } from "@/components/ui/shuffle-grid";
 import { Carousel, TestimonialCard } from "@/components/ui/retro-testimonial";
 import { AnimatedGroup } from "@/components/ui/animated-group";
@@ -11,8 +10,8 @@ import AboutUsSection from "@/components/ui/about-us-section";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import TeamShowcase from "@/components/ui/team-showcase";
 import { ShootingStars } from "@/components/ui/shooting-stars";
-import { Users } from "lucide-react";
 import InteractiveBentoGallery from "@/components/ui/interactive-bento-gallery";
+import { useSupabaseData } from "@/hooks/useSupabaseData";
 
 const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
@@ -28,8 +27,36 @@ const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) =>
     }
 };
 
+const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch (e) {
+        return dateStr;
+    }
+};
+
+const getEventStatus = (start: any, end: any) => {
+    if (!start) return "Upcoming Event";
+    const now = new Date();
+    const startDate = new Date(start);
+    // Set endDate to the VERY END of the end date (23:59:59) to ensure it lasts all day
+    const endDateStr = end || start;
+    const endDate = new Date(new Date(endDateStr).setHours(23, 59, 59, 999));
+
+    if (now < startDate) return "Upcoming Event";
+    if (now >= startDate && now <= endDate) return "Active Gathering";
+    return "Event Archived";
+};
+
+const toGoogleDate = (date: any) => {
+    if (!date) return "";
+    return new Date(date).toISOString().replace(/-|:|\.\d\d\d/g, "");
+};
+
 // Navbar Component
-const Navbar = () => {
+const Navbar = ({ navLinks }: { navLinks: any[] }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -61,7 +88,7 @@ const Navbar = () => {
 
                 {/* Desktop Menu */}
                 <div className="hidden md:flex items-center gap-8">
-                    {NAV_LINKS.map((link) => (
+                    {navLinks.map((link) => (
                         <a
                             key={link.name}
                             href={link.href}
@@ -102,7 +129,7 @@ const Navbar = () => {
                         exit={{ opacity: 0, y: -20 }}
                         className="absolute top-full left-0 right-0 bg-white border-b border-accent-purple/20 flex flex-col p-6 gap-4 md:hidden"
                     >
-                        {NAV_LINKS.map((link) => (
+                        {navLinks.map((link) => (
                             <a
                                 key={link.name}
                                 href={link.href}
@@ -140,8 +167,31 @@ const SectionHeader = ({ title, subtitle, icon: Icon }: { title: string, subtitl
 );
 
 export default function Home() {
+    const { navLinks, teamMembers, talents, youtubeVideos, gallery: fanartItems, socialLinks, events } = useSupabaseData();
+    const joinSectionRef = useRef(null);
+
+    const { scrollYProgress: joinScrollY } = useScroll({
+        target: joinSectionRef,
+        offset: ["start end", "end start"]
+    });
+
+    const joinBackgroundY = useTransform(joinScrollY, [0, 1], ["-15%", "15%"]);
+
+    // Mapping SQUARE_DATA from fanart or fallback
+    const squareData = fanartItems
+        .filter((item: any) => item.type === 'image')
+        .slice(0, 16)
+        .map((item: any, idx: number) => ({
+            id: item.id || idx,
+            url: item.url
+        }));
+
+    const featuredEvent = events && events.length > 0 ? events[0] : null
+
+    const eventStatus = featuredEvent ? getEventStatus(featuredEvent.date_start, featuredEvent.date_end) : null;
+
     return (
-        <div className="min-h-screen bg-background text-foreground selection:bg-accent-yellow selection:text-deep-purple">
+        <div className="min-h-screen relative bg-background text-foreground selection:bg-accent-yellow selection:text-deep-purple">
             {/* Background Layers */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(216,180,254,0.1)_0%,transparent_70%)]" />
@@ -176,38 +226,136 @@ export default function Home() {
             </div>
 
             <style>{`
-    .stars - background {
-    background - image:
-    radial - gradient(1px 1px at 20px 30px, #fde047, rgba(0, 0, 0, 0)),
-        radial - gradient(1px 1px at 40px 70px, #ffffff, rgba(0, 0, 0, 0)),
-        radial - gradient(1px 1px at 50px 160px, #d8b4fe, rgba(0, 0, 0, 0)),
-        radial - gradient(1px 1px at 90px 40px, #ffffff, rgba(0, 0, 0, 0)),
-        radial - gradient(1px 1px at 130px 80px, #fde047, rgba(0, 0, 0, 0)),
-        radial - gradient(1px 1px at 160px 120px, #d8b4fe, rgba(0, 0, 0, 0));
-    background - repeat: repeat;
-    background - size: 250px 250px;
-    animation: twinkle 8s ease -in -out infinite;
-}
+                .stars-background {
+                    background-image:
+                        radial-gradient(1px 1px at 20px 30px, #fde047, rgba(0, 0, 0, 0)),
+                        radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0, 0, 0, 0)),
+                        radial-gradient(1px 1px at 50px 160px, #d8b4fe, rgba(0, 0, 0, 0)),
+                        radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0, 0, 0, 0)),
+                        radial-gradient(1px 1px at 130px 80px, #fde047, rgba(0, 0, 0, 0)),
+                        radial-gradient(1px 1px at 160px 120px, #d8b4fe, rgba(0, 0, 0, 0));
+                    background-repeat: repeat;
+                    background-size: 250px 250px;
+                    animation: twinkle 8s ease-in-out infinite;
+                }
 
-        .dots - pattern {
-    background - image: radial - gradient(#6b21a8 1px, transparent 1px);
-    background - size: 32px 32px;
-}
+                .dots-pattern {
+                    background-image: radial-gradient(#6b21a8 1px, transparent 1px);
+                    background-size: 32px 32px;
+                }
 
-@keyframes twinkle {
-    0 %, 100 % { opacity: 0.15; transform: scale(1); }
-    50 % { opacity: 0.4; transform: scale(1.05); }
-}
-`}</style>
+                @keyframes twinkle {
+                    0%, 100% { opacity: 0.15; transform: scale(1); }
+                    50% { opacity: 0.4; transform: scale(1.05); }
+                }
+            `}</style>
 
-            <Navbar />
+            <Navbar navLinks={navLinks} />
 
             {/* Hero Section */}
             <section id="home" className="relative min-h-screen flex items-center pt-20">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(216,180,254,0.15)_0%,transparent_70%)]" />
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-                <ShuffleHero />
+                <ShuffleHero images={squareData} />
             </section>
+
+            {/* Next Event Section */}
+            {featuredEvent && (
+                <section id="events" className="py-24 relative overflow-hidden">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-yellow/5 blur-[120px] rounded-full -z-10" />
+                    <SectionHeader
+                        title="Royal Proclamation"
+                        subtitle="Hearken to the heralds! Behold the next grand gathering of Sovereigns within our digital empire."
+                        icon={Calendar}
+                    />
+
+                    <div className="container mx-auto px-6 max-w-4xl">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-white/40 backdrop-blur-xl border-4 border-white rounded-[3rem] p-10 shadow-[0_30px_60px_rgba(107,33,168,0.1)] relative group overflow-hidden"
+                        >
+                            {/* Corner Flourishes */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-accent-yellow/10 rounded-bl-[100px] transition-all group-hover:bg-accent-yellow/20" />
+
+                            <div className="relative z-10 flex flex-col md:flex-row gap-8 items-center">
+                                <div className="w-full md:w-1/3">
+                                    <div className="aspect-square rounded-3xl overflow-hidden border-4 border-white shadow-xl relative">
+                                        <img
+                                            src={featuredEvent.image_url}
+                                            alt={featuredEvent.title}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        />
+                                        <div className={cn(
+                                            "absolute top-4 left-4 px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-lg transition-all",
+                                            eventStatus === "Active Gathering" ? "bg-accent-purple text-white animate-pulse" : "bg-accent-yellow text-deep-purple"
+                                        )}>
+                                            {eventStatus}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-full md:w-2/3 space-y-6">
+                                    <div className="space-y-2">
+                                        <h3 className="text-3xl md:text-4xl font-sans font-black text-deep-purple uppercase tracking-tighter leading-none">
+                                            {featuredEvent.title}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-4 pt-2">
+                                            <motion.div
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => {
+                                                    const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(featuredEvent.title)}&dates=${toGoogleDate(featuredEvent.date_start)}/${toGoogleDate(featuredEvent.date_end || featuredEvent.date_start)}&details=${encodeURIComponent(featuredEvent.description)}&location=${encodeURIComponent(featuredEvent.location)}`;
+                                                    window.open(gCalUrl, '_blank');
+                                                }}
+                                                className="flex items-center gap-2 text-accent-purple font-bold text-xs uppercase tracking-widest cursor-pointer hover:text-deep-purple transition-all group/cal"
+                                                title="Add to Calendar"
+                                            >
+                                                <Calendar className="w-4 h-4 group-hover/cal:scale-110 transition-transform" />
+                                                <span className="group-hover/cal:underline decoration-accent-yellow/50 underline-offset-4">
+                                                    {formatDate(featuredEvent.date_start || featuredEvent.date)}
+                                                    {featuredEvent.date_end && ` - ${formatDate(featuredEvent.date_end)}`}
+                                                </span>
+                                            </motion.div>
+                                            <div className="flex items-center gap-2 text-accent-purple font-bold text-xs uppercase tracking-widest">
+                                                <MapPin className="w-4 h-4" />
+                                                {featuredEvent.location_url ? (
+                                                    <a
+                                                        href={featuredEvent.location_url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="hover:text-deep-purple underline decoration-accent-yellow/50 underline-offset-4 transition-colors"
+                                                    >
+                                                        {featuredEvent.location}
+                                                    </a>
+                                                ) : (
+                                                    featuredEvent.location
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-muted-foreground text-lg leading-relaxed italic">
+                                        "{featuredEvent.description}"
+                                    </p>
+
+                                    <div className="pt-4 flex flex-wrap gap-4">
+                                        <a
+                                            href={featuredEvent.button_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-8 py-4 bg-deep-purple text-white font-black uppercase tracking-[0.2em] text-xs rounded-full hover:bg-accent-yellow hover:text-deep-purple transition-all shadow-xl active:scale-95 inline-flex items-center gap-2"
+                                        >
+                                            {featuredEvent.button_text} <ArrowRight className="w-4 h-4" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+            )}
 
             {/* Music Features Section */}
             <section id="music-features" className="py-24 bg-pastel-yellow/20 relative overflow-hidden">
@@ -237,12 +385,12 @@ export default function Home() {
             {/* Talent Showcase Section */}
             <section id="talent" className="py-24 bg-white relative overflow-hidden">
                 <SectionHeader
-                    title="Our Radiant Talent"
-                    subtitle="Behold the elite knights and visionaries who sharpen the edge of our digital empire."
-                    icon={Users}
+                    title="The Royal Lineage"
+                    subtitle="Behold the regal monarchs and divine icons who reign over our digital empire."
+                    icon={Crown}
                 />
                 <div className="container mx-auto px-6">
-                    <TeamShowcase members={TALENTS} />
+                    <TeamShowcase members={talents} />
                 </div>
             </section>
 
@@ -259,7 +407,7 @@ export default function Home() {
                     />
                     <div className="container mx-auto">
                         <Carousel
-                            items={TEAM_MEMBERS.map((member, index) => (
+                            items={teamMembers.map((member: any, index: number) => (
                                 <TestimonialCard
                                     key={member.id}
                                     testimonial={member}
@@ -282,7 +430,7 @@ export default function Home() {
                     <div className="container mx-auto">
                         {/* Show top 4 items as a snapshot */}
                         <InteractiveBentoGallery
-                            mediaItems={FANART_ITEMS.slice(0, 4).map((item) => ({
+                            mediaItems={fanartItems.slice(0, 4).map((item: any) => ({
                                 ...item,
                                 span: ''
                             }))}
@@ -308,7 +456,7 @@ export default function Home() {
                     <div className="w-full md:w-1/2 relative">
                         <div className="absolute -inset-4 border-2 border-accent-yellow/20 rounded-2xl -z-10 animate-pulse" />
                         <img
-                            src="/assets/images/retouch_2025110222543049.jpg"
+                            src="https://qparvzpvbowzllslfjpo.supabase.co/storage/v1/object/public/assets/images/retouch_2025110222543049.jpg"
                             alt="Castle Throne"
                             className="rounded-2xl shadow-2xl border border-accent-yellow/10"
                         />
@@ -335,7 +483,7 @@ export default function Home() {
                 />
                 <div className="container mx-auto px-6">
                     <AnimatedGroup preset="slide" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {YOUTUBE_VIDEOS.map((id) => (
+                        {youtubeVideos.map((id: string) => (
                             <div key={id} className="aspect-video rounded-xl overflow-hidden border border-accent-purple/10 shadow-lg group hover:border-accent-purple/30 transition-all">
                                 <iframe
                                     className="w-full h-full"
@@ -354,27 +502,19 @@ export default function Home() {
             {/* Donation Section with Parallax Background */}
             <section
                 id="join"
+                ref={joinSectionRef}
                 className="py-32 relative overflow-hidden flex items-center justify-center min-h-[70vh] group/parallax"
             >
                 {/* Parallax Background Container */}
                 <motion.div
-                    style={{
-                        y: useTransform(
-                            useScroll({
-                                target: useRef(null),
-                                offset: ["start end", "end start"]
-                            }).scrollYProgress,
-                            [0, 1],
-                            ["-15%", "15%"]
-                        )
-                    }}
+                    style={{ y: joinBackgroundY }}
                     className="absolute inset-0 z-0 scale-110"
                 >
                     {/* Dark Royal Overlays for Text Contrast */}
                     <div className="absolute inset-0 bg-gradient-to-b from-deep-purple/60 via-deep-purple/20 to-deep-purple/80 z-10" />
                     <div className="absolute inset-0 bg-black/30 z-10" />
                     <img
-                        src="/assets/background/Majikan-Day_BG.jpg"
+                        src="https://qparvzpvbowzllslfjpo.supabase.co/storage/v1/object/public/assets/background/Majikan-Day_BG.jpg"
                         alt="Majikan Day Royal Archives"
                         className="w-full h-full object-cover grayscale-[0.2] group-hover/parallax:grayscale-0 transition-all duration-1000"
                     />
@@ -401,7 +541,7 @@ export default function Home() {
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <a
-                                href="https://discord.gg/DwuHCf7b"
+                                href={socialLinks.discord}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="px-12 py-5 bg-accent-yellow text-deep-purple font-black uppercase tracking-widest rounded-full hover:bg-white hover:scale-105 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.3)] active:scale-95 flex items-center justify-center gap-3 group/btn"
@@ -424,7 +564,7 @@ export default function Home() {
 
                         {/* Centered Navigation */}
                         <nav className="mb-8 flex flex-wrap justify-center gap-x-8 gap-y-4">
-                            {NAV_LINKS.map((link) => (
+                            {navLinks.map((link: any) => (
                                 <a
                                     key={link.name}
                                     href={link.href}
@@ -446,7 +586,7 @@ export default function Home() {
                         {/* Circular Social Icons */}
                         <div className="mb-8 flex space-x-4">
                             <a
-                                href={SOCIAL_LINKS.youtube}
+                                href={socialLinks.youtube}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
@@ -454,7 +594,7 @@ export default function Home() {
                                 <Youtube className="h-5 w-5" />
                             </a>
                             <a
-                                href={SOCIAL_LINKS.discord}
+                                href={socialLinks.discord}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
@@ -462,7 +602,7 @@ export default function Home() {
                                 <Disc className="h-5 w-5" />
                             </a>
                             <a
-                                href={SOCIAL_LINKS.sociabuzz}
+                                href={socialLinks.sociabuzz}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
@@ -486,17 +626,17 @@ export default function Home() {
             < div className="fixed bottom-6 right-6 z-[100] hidden md:block" >
                 <Dock direction="bottom" className="bg-white/80 border-accent-purple/20 shadow-2xl">
                     <DockIcon className="bg-accent-yellow/20 hover:bg-accent-yellow transition-colors group">
-                        <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
+                        <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
                             <Youtube className="w-6 h-6 text-deep-purple group-hover:scale-110 transition-transform" />
                         </a>
                     </DockIcon>
                     <DockIcon className="bg-accent-purple/10 hover:bg-accent-purple hover:text-white transition-colors group">
-                        <a href={SOCIAL_LINKS.discord} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
+                        <a href={socialLinks.discord} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
                             <Disc className="w-6 h-6 text-deep-purple group-hover:text-white group-hover:scale-110 transition-transform" />
                         </a>
                     </DockIcon>
                     <DockIcon className="bg-accent-purple/10 hover:bg-accent-purple hover:text-white transition-colors group">
-                        <a href={SOCIAL_LINKS.sociabuzz} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
+                        <a href={socialLinks.sociabuzz} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
                             <Heart className="w-6 h-6 text-deep-purple group-hover:text-white group-hover:scale-110 transition-transform" />
                         </a>
                     </DockIcon>

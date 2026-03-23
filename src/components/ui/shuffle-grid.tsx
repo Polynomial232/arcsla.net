@@ -2,9 +2,8 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { SQUARE_DATA } from "../../data";
 
-export const ShuffleHero = () => {
+export const ShuffleHero = ({ images }: { images?: any[] }) => {
     return (
         <section className="w-full px-8 py-12 grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-6xl mx-auto">
             <div>
@@ -18,7 +17,7 @@ export const ShuffleHero = () => {
                     Forge your legacy within the monumental walls of ARCSLA. We provide the steel of technology and the fire of creativity to conquer any digital realm.
                 </p>
             </div>
-            <ShuffleGrid />
+            <ShuffleGrid images={images} />
         </section>
     );
 };
@@ -40,15 +39,16 @@ const shuffle = (array: any[]) => {
     return array;
 };
 
-const generateSquares = () => {
-    return shuffle([...SQUARE_DATA]).map((sq) => (
+const generateSquares = (images?: any[]) => {
+    if (!images || images.length === 0) return [];
+    return shuffle([...images]).map((sq) => (
         <motion.div
             key={sq.id}
             layout
             transition={{ duration: 1.5, type: "spring" }}
             className="w-full h-full rounded-md overflow-hidden bg-muted"
             style={{
-                backgroundImage: `url(${sq.src})`,
+                backgroundImage: `url(${sq.url})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
             }}
@@ -56,9 +56,13 @@ const generateSquares = () => {
     ));
 };
 
-const ShuffleGrid = () => {
+const ShuffleGrid = ({ images }: { images?: any[] }) => {
     const timeoutRef = useRef<number | null>(null);
-    const [squares, setSquares] = useState(generateSquares());
+    const [squares, setSquares] = useState(generateSquares(images));
+
+    useEffect(() => {
+        setSquares(generateSquares(images));
+    }, [images]);
 
     useEffect(() => {
         shuffleSquares();
@@ -68,10 +72,10 @@ const ShuffleGrid = () => {
                 clearTimeout(timeoutRef.current);
             }
         };
-    }, []);
+    }, [images]);
 
     const shuffleSquares = () => {
-        setSquares(generateSquares());
+        setSquares(generateSquares(images));
 
         timeoutRef.current = window.setTimeout(shuffleSquares, 3000);
     };

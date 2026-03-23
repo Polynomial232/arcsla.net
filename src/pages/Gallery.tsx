@@ -1,10 +1,26 @@
 import { Link } from "react-router-dom";
 import { Crown, ArrowLeft, Palette } from "lucide-react";
 import InteractiveBentoGallery from "@/components/ui/interactive-bento-gallery";
-import { FANART_ITEMS } from "../data";
 import { ShootingStars } from "@/components/ui/shooting-stars";
+import { useSupabaseData } from "@/hooks/useSupabaseData";
+
+import { useEffect } from "react";
 
 export default function Gallery() {
+    const { gallery, loading, galleryLoading, hasMoreGallery, fetchMoreGallery } = useSupabaseData();
+    const items = gallery;
+
+    // Infinite scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 1000) {
+                fetchMoreGallery();
+            }
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [fetchMoreGallery]);
+
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-accent-yellow selection:text-deep-purple">
             {/* Background Layers */}
@@ -74,11 +90,32 @@ export default function Gallery() {
                         </p>
                     </div>
 
-                    <InteractiveBentoGallery
-                        mediaItems={FANART_ITEMS}
-                        title="Sovereign Collection"
-                        description="Drag and explore our curated collection of shots"
-                    />
+                    {loading ? (
+                        <div className="h-[60vh] flex items-center justify-center">
+                            <Crown className="w-12 h-12 text-accent-purple animate-bounce" />
+                        </div>
+                    ) : (
+                        <>
+                            <InteractiveBentoGallery
+                                mediaItems={items}
+                                title="Sovereign Collection"
+                                description="Drag and explore our curated collection of shots"
+                            />
+
+                            {/* Load more indicator */}
+                            <div className="mt-12 text-center h-20 flex items-center justify-center">
+                                {galleryLoading && (
+                                    <div className="flex flex-col items-center gap-2">
+                                        <Crown className="w-8 h-8 text-accent-purple animate-bounce" />
+                                        <p className="text-xs font-black uppercase tracking-widest text-accent-purple/60">Summoning more treasures...</p>
+                                    </div>
+                                )}
+                                {!hasMoreGallery && items.length > 0 && (
+                                    <p className="text-xs font-black uppercase tracking-widest text-muted-foreground italic">You have beholden all our royal archives.</p>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </main>
 

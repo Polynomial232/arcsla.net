@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 // ===== Types and Interfaces =====
 export interface iTestimonial {
     id?: string;
+    discord_id?: string;
     username?: string;
     name: string;
     designation: string;
     description: string;
-    profileImage: string;
+    profile_image: string;
 }
 
 interface iCarouselProps {
@@ -134,13 +135,13 @@ const TestimonialCard = ({
             <div className="absolute inset-0 opacity-10 pointer-events-none">
                 <img
                     className="w-full h-full object-cover"
-                    src={testimonial.profileImage}
+                    src={testimonial.profile_image}
                     alt="Background layer"
                     draggable={false}
                 />
             </div>
 
-            <ProfileImage src={testimonial.profileImage} alt={testimonial.name} />
+            <ProfileImage url={testimonial.profile_image} alt={testimonial.name} />
 
             <div className="px-8 mt-8 space-y-4">
                 <p className="text-foreground/80 text-xl font-medium text-center line-clamp-4 lowercase italic leading-relaxed">
@@ -152,7 +153,7 @@ const TestimonialCard = ({
                     </p>
                     {testimonial.username && testimonial.id && (
                         <a
-                            href={`https://discord.com/users/${testimonial.id}`}
+                            href={`https://discord.com/users/${testimonial.discord_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-accent-purple/60 text-sm font-bold text-center block hover:text-deep-purple transition-colors mb-1 relative z-50 pointer-events-auto"
@@ -169,7 +170,7 @@ const TestimonialCard = ({
         </div>
     );
 };
-const ProfileImage = ({ src, alt, className }: { src: string; alt?: string; className?: string }) => {
+const ProfileImage = ({ url, alt, className }: { url: string; alt?: string; className?: string }) => {
     const [isLoading, setLoading] = useState(true);
 
     return (
@@ -183,7 +184,7 @@ const ProfileImage = ({ src, alt, className }: { src: string; alt?: string; clas
                     isLoading ? "blur-sm" : "blur-0",
                 )}
                 onLoad={() => setLoading(false)}
-                src={src}
+                src={url}
                 draggable={false}
                 loading="lazy"
                 alt={alt || "Profile image"}

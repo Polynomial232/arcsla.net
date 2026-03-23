@@ -14,9 +14,14 @@ import {
 } from "lucide-react"
 import { motion, useScroll, useTransform, useInView, useSpring, type Variants } from "framer-motion"
 import { cn } from "@/lib/utils"
-import fortressImg from '@/assets/fanart/Kaira_Feeds-2.webp'; // Moved to top
+import { useSupabaseData } from "@/hooks/useSupabaseData"
+
+
+
+import { getStorageUrl } from "@/utils/supabase"
 
 export default function AboutUsSection() {
+    const { services: fetchedServices, loading } = useSupabaseData()
     const sectionRef = useRef<HTMLDivElement>(null)
     const statsRef = useRef<HTMLDivElement>(null)
     const isInView = useInView(sectionRef, { once: false, amount: 0.1 })
@@ -53,20 +58,21 @@ export default function AboutUsSection() {
         },
     }
 
-    const services = [
-        {
-            icon: <Youtube className="w-6 h-6" />,
-            title: "YouTube Video",
-            description: "",
-            position: "left",
-        },
-        {
-            icon: <Disc className="w-6 h-6" />,
-            title: "Music Production",
-            description: "",
-            position: "right",
-        },
-    ]
+    const getServiceIcon = (title: string) => {
+        const t = (title || "").toLowerCase();
+        if (t.includes('youtube') || t.includes('video')) return Youtube;
+        if (t.includes('music') || t.includes('disc') || t.includes('production')) return Disc;
+        if (t.includes('fortress') || t.includes('digital') || t.includes('sovereign')) return Sword;
+        return Sparkles;
+    };
+
+    const services = (fetchedServices || []).map(s => {
+        const IconComponent = getServiceIcon(s.title);
+        return {
+            ...s,
+            icon: <IconComponent className="w-6 h-6" />
+        };
+    });
 
     const stats = [
         { icon: <Users className="w-6 h-6" />, value: 17100, label: "Subscribers", suffix: "K", stringValue: "17K+", isFloat: true },
@@ -80,6 +86,7 @@ export default function AboutUsSection() {
             id="services"
             ref={sectionRef}
             className="w-full py-24 px-4 bg-pastel-yellow/30 text-deep-purple overflow-hidden relative"
+            style={{ position: 'relative' }}
         >
             {/* Decorative background elements from example */}
             <motion.div
@@ -123,25 +130,34 @@ export default function AboutUsSection() {
                 animate={isInView ? "visible" : "hidden"}
                 variants={containerVariants}
             >
-                <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
-                    <motion.span
-                        className="text-accent-purple font-black mb-2 flex items-center gap-2 tracking-[0.2em] text-xs"
-                    >
-                        <Sword className="w-4 h-4" />
-                        DOMINATE THE DIGITAL REALM
-                    </motion.span>
-                    <h2 className="text-4xl md:text-5xl font-black mb-4 text-center uppercase tracking-tighter">Digital Sovereignty</h2>
-                    <motion.div
-                        className="w-24 h-1 bg-accent-yellow rounded-full"
-                        initial={{ width: 0 }}
-                        animate={isInView ? { width: 96 } : { width: 0 }}
-                        transition={{ duration: 1, delay: 0.5 }}
-                    ></motion.div>
-                </motion.div>
+                {loading && (!fetchedServices || fetchedServices.length === 0) ? (
+                    <div className="flex flex-col items-center justify-center min-h-[400px]">
+                        <Sparkles className="w-12 h-12 text-accent-purple animate-pulse mb-4" />
+                        <p className="text-accent-purple font-black text-xs uppercase tracking-widest">Summoning Services...</p>
+                    </div>
+                ) : (
+                    <>
+                        <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
+                            <motion.span
+                                className="text-accent-purple font-black mb-2 flex items-center gap-2 tracking-[0.2em] text-xs"
+                            >
+                                <Sword className="w-4 h-4" />
+                                DOMINATE THE DIGITAL REALM
+                            </motion.span>
+                            <h2 className="text-4xl md:text-5xl font-black mb-4 text-center uppercase tracking-tighter">Digital Sovereignty</h2>
+                            <motion.div
+                                className="w-24 h-1 bg-accent-yellow rounded-full"
+                                initial={{ width: 0 }}
+                                animate={isInView ? { width: 96 } : { width: 0 }}
+                                transition={{ duration: 1, delay: 0.5 }}
+                            ></motion.div>
+                        </motion.div>
 
-                <motion.p className="text-center max-w-2xl mx-auto mb-16 text-deep-purple/70 text-lg md:text-xl italic font-medium leading-relaxed" variants={itemVariants}>
-                    "We build unshakeable digital fortresses and interactive kingdoms tailored to your sovereign brand identity."
-                </motion.p>
+                        <motion.p className="text-center max-w-2xl mx-auto mb-16 text-deep-purple/70 text-lg md:text-xl italic font-medium leading-relaxed" variants={itemVariants}>
+                            "We build unshakeable digital fortresses and interactive kingdoms tailored to your sovereign brand identity."
+                        </motion.p>
+                    </>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative items-center">
                     {/* Left Column */}
@@ -172,7 +188,7 @@ export default function AboutUsSection() {
                                 whileHover={{ scale: 1.03, transition: { duration: 0.3 } }}
                             >
                                 <img
-                                    src={fortressImg}
+                                    src={getStorageUrl('fanart', 'Kaira_Feeds-2.webp')}
                                     alt="ARCSLA Fortress"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />

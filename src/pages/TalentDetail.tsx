@@ -1,13 +1,58 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Crown, Instagram, Twitter, Linkedin, Palette, Award, Shield, Sparkles, Youtube, Heart } from "lucide-react";
-import { TALENTS } from "../data";
 import { ShootingStars } from "@/components/ui/shooting-stars";
+import { supabase, getStorageUrl, preloadImage } from "@/utils/supabase";
 
 export default function TalentDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const member = TALENTS.find((m) => m.id === id);
+    const [member, setMember] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchTalent() {
+            try {
+                const { data, error } = await supabase
+                    .from('talents')
+                    .select('*, talents_images(*)')
+                    .eq('id', id)
+                    .order('order_index', { foreignTable: 'talents_images', ascending: true })
+                    .single();
+
+                if (data && !error) {
+                    const mappedData = {
+                        ...data,
+                        image: getStorageUrl('talents', data.image),
+                        portfolio: (data.talents_images || []).map((img: any) => getStorageUrl('talents', img.url))
+                    };
+
+                    // Preload main image before showing component
+                    await preloadImage(mappedData.image);
+                    
+                    setMember(mappedData);
+
+                    // Preload portfolio in background
+                    mappedData.portfolio.forEach((url: string) => preloadImage(url));
+                }
+            } catch (err) {
+                console.error("Error fetching talent:", err);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchTalent();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background text-deep-purple">
+                <Crown className="w-16 h-16 animate-bounce text-accent-purple" />
+            </div>
+        );
+    }
 
     if (!member) {
         return (
@@ -23,6 +68,10 @@ export default function TalentDetail() {
             </div>
         );
     }
+
+    const portfolio = member.portfolio || [];
+    const specialties = member.specialties || [];
+    const social = member.social || {};
 
     return (
         <div className="min-h-screen bg-background text-foreground selection:bg-accent-yellow selection:text-deep-purple relative overflow-x-hidden">
@@ -116,36 +165,28 @@ export default function TalentDetail() {
                                 </div>
 
                                 <div className="mt-12 flex flex-wrap gap-4">
-                                    {/* @ts-ignore */}
-                                    {member.social?.linkedin && (
-                                        /* @ts-ignore */
-                                        <a href={member.social.linkedin} className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
+                                    {social.linkedin && (
+                                        <a href={social.linkedin} className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
                                             <Linkedin className="w-5 h-5" />
                                         </a>
                                     )}
-                                    {member.social?.twitter && (
-                                        <a href={member.social.twitter} className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
+                                    {social.twitter && (
+                                        <a href={social.twitter} className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
                                             <Twitter className="w-5 h-5" />
                                         </a>
                                     )}
-                                    {/* @ts-ignore */}
-                                    {member.social?.instagram && (
-                                        /* @ts-ignore */
-                                        <a href={member.social.instagram} className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
+                                    {social.instagram && (
+                                        <a href={social.instagram} className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
                                             <Instagram className="w-5 h-5" />
                                         </a>
                                     )}
-                                    {/* @ts-ignore */}
-                                    {member.social?.youtube && (
-                                        /* @ts-ignore */
-                                        <a href={member.social.youtube} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
+                                    {social.youtube && (
+                                        <a href={social.youtube} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
                                             <Youtube className="w-5 h-5" />
                                         </a>
                                     )}
-                                    {/* @ts-ignore */}
-                                    {member.social?.sociabuzz && (
-                                        /* @ts-ignore */
-                                        <a href={member.social.sociabuzz} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
+                                    {social.sociabuzz && (
+                                        <a href={social.sociabuzz} target="_blank" rel="noopener noreferrer" className="w-12 h-12 rounded-full bg-white border border-accent-purple/10 flex items-center justify-center text-deep-purple hover:bg-accent-purple hover:text-white transition-all shadow-md">
                                             <Heart className="w-5 h-5" />
                                         </a>
                                     )}
@@ -174,7 +215,7 @@ export default function TalentDetail() {
                                     <div className="prose prose-lg prose-purple max-w-none">
                                         <div
                                             className="text-xl text-muted-foreground leading-relaxed italic border-l-4 border-accent-yellow pl-6 space-y-4"
-                                            dangerouslySetInnerHTML={{ __html: member.fullBio }}
+                                            dangerouslySetInnerHTML={{ __html: member.full_bio }}
                                         />
                                     </div>
 
@@ -184,7 +225,7 @@ export default function TalentDetail() {
                                             <Award className="w-4 h-4 text-accent-purple" /> Noble Specialties
                                         </h3>
                                         <div className="flex flex-wrap gap-3">
-                                            {member.specialties?.map((spec, i) => (
+                                            {specialties.map((spec: string, i: number) => (
                                                 <span key={i} className="px-5 py-2 bg-white border border-accent-purple/10 rounded-full text-xs font-bold text-deep-purple uppercase tracking-widest shadow-sm">
                                                     {spec}
                                                 </span>
@@ -199,13 +240,13 @@ export default function TalentDetail() {
                     </div>
 
                     {/* Full Width Portfolio Section */}
-                    {member.portfolio && member.portfolio.length > 0 && (
+                    {portfolio.length > 0 && (
                         <div className="mt-6 pt-16 border-t border-accent-purple/10">
                             <h3 className="text-xs font-black text-deep-purple uppercase tracking-[0.2em] mb-12 flex items-center justify-center gap-2">
                                 <Palette className="w-5 h-5 text-accent-purple" /> Visual Legacy
                             </h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                                {member.portfolio.map((img, i) => (
+                                {portfolio.map((img: string, i: number) => (
                                     <motion.div
                                         key={i}
                                         initial={{ opacity: 0, y: 20 }}

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaLinkedinIn, FaTwitter, FaBehance, FaInstagram, FaYoutube, FaHeart } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
-import { TALENTS } from '../../data';
 
 export interface TeamMember {
     id: string;
@@ -20,10 +19,10 @@ export interface TeamMember {
 }
 
 interface TeamShowcaseProps {
-    members?: TeamMember[];
+    members: TeamMember[];
 }
 
-export default function TeamShowcase({ members = TALENTS }: TeamShowcaseProps) {
+export default function TeamShowcase({ members }: TeamShowcaseProps) {
     const [hoveredId, setHoveredId] = useState<string | null>(null);
     const navigate = useNavigate();
 
