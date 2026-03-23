@@ -8,6 +8,12 @@ export const NAV_LINKS = [
     { name: "Theatre", href: "#youtube" },
 ];
 
+export const SOCIAL_LINKS = {
+    youtube: "https://youtube.com/@Arcsla",
+    discord: "https://discord.gg/DwuHCf7b",
+    sociabuzz: "https://sociabuzz.com/kairanyanko/support"
+};
+
 export const SERVICES = [
     {
         id: "svc-1",
@@ -88,7 +94,7 @@ export const TALENTS = [
     {
         id: "KairaArcsladivya",
         name: "Kaira Arcsladivya",
-        role: "Princess",
+        role: "Saintess",
         image: "/assets/talents/KairaArcsladivya.jpg",
         fullBio: `
             <div class="space-y-6 text-sm md:text-base leading-relaxed">

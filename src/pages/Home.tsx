@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Menu, X, Crown, Youtube, Music, Heart, Mail, Disc, Share2, Palette, ArrowRight } from "lucide-react";
+import { Menu, X, Crown, Youtube, Music, Heart, Disc, Share2, Palette, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV_LINKS, TEAM_MEMBERS, TALENTS, YOUTUBE_VIDEOS, FANART_ITEMS } from "../data";
+import { NAV_LINKS, TEAM_MEMBERS, TALENTS, YOUTUBE_VIDEOS, FANART_ITEMS, SOCIAL_LINKS } from "../data";
 import { ShuffleHero } from "@/components/ui/shuffle-grid";
 import { Carousel, TestimonialCard } from "@/components/ui/retro-testimonial";
 import { AnimatedGroup } from "@/components/ui/animated-group";
@@ -446,28 +446,28 @@ export default function Home() {
                         {/* Circular Social Icons */}
                         <div className="mb-8 flex space-x-4">
                             <a
-                                href="#"
+                                href={SOCIAL_LINKS.youtube}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
                             >
                                 <Youtube className="h-5 w-5" />
                             </a>
                             <a
-                                href="#"
+                                href={SOCIAL_LINKS.discord}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
                             >
                                 <Disc className="h-5 w-5" />
                             </a>
                             <a
-                                href="#"
+                                href={SOCIAL_LINKS.sociabuzz}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
                             >
-                                <Share2 className="h-5 w-5" />
-                            </a>
-                            <a
-                                href="#"
-                                className="w-12 h-12 flex items-center justify-center rounded-full border-2 border-accent-purple/10 text-deep-purple hover:bg-accent-yellow hover:border-accent-yellow hover:scale-110 transition-all shadow-sm"
-                            >
-                                <Mail className="h-5 w-5" />
+                                <Heart className="h-5 w-5" />
                             </a>
                         </div>
 
@@ -486,23 +486,18 @@ export default function Home() {
             < div className="fixed bottom-6 right-6 z-[100] hidden md:block" >
                 <Dock direction="bottom" className="bg-white/80 border-accent-purple/20 shadow-2xl">
                     <DockIcon className="bg-accent-yellow/20 hover:bg-accent-yellow transition-colors group">
-                        <a href="#" className="flex items-center justify-center w-full h-full">
+                        <a href={SOCIAL_LINKS.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
                             <Youtube className="w-6 h-6 text-deep-purple group-hover:scale-110 transition-transform" />
                         </a>
                     </DockIcon>
                     <DockIcon className="bg-accent-purple/10 hover:bg-accent-purple hover:text-white transition-colors group">
-                        <a href="#" className="flex items-center justify-center w-full h-full">
+                        <a href={SOCIAL_LINKS.discord} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
                             <Disc className="w-6 h-6 text-deep-purple group-hover:text-white group-hover:scale-110 transition-transform" />
                         </a>
                     </DockIcon>
                     <DockIcon className="bg-accent-purple/10 hover:bg-accent-purple hover:text-white transition-colors group">
-                        <a href="#" className="flex items-center justify-center w-full h-full">
-                            <Share2 className="w-6 h-6 text-deep-purple group-hover:text-white group-hover:scale-110 transition-transform" />
-                        </a>
-                    </DockIcon>
-                    <DockIcon className="bg-accent-yellow/20 hover:bg-black hover:text-white transition-colors group">
-                        <a href="#" className="flex items-center justify-center w-full h-full">
-                            <Mail className="w-6 h-6 text-deep-purple group-hover:text-white group-hover:scale-110 transition-transform" />
+                        <a href={SOCIAL_LINKS.sociabuzz} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center w-full h-full">
+                            <Heart className="w-6 h-6 text-deep-purple group-hover:text-white group-hover:scale-110 transition-transform" />
                         </a>
                     </DockIcon>
                 </Dock>
