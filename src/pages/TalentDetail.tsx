@@ -104,7 +104,7 @@ export default function TalentDetail() {
           `Profil resmi ${member.name} dari Arcsla Kingdom. Temukan karya, portofolio, dan perjalanan kreator digital ini.`
         }
         image={member.image}
-        url={`https://arcsla.net/talent/${id}`}
+        url={`https://arcsla.net/talents/${id}`}
         type="profile"
         jsonLd={{
           "@context": "https://schema.org",
@@ -112,7 +112,7 @@ export default function TalentDetail() {
           name: member.name,
           description: member.bio || `Sovereign Talent dari Arcsla Kingdom.`,
           image: member.image,
-          url: `https://arcsla.net/talent/${id}`,
+          url: `https://arcsla.net/talents/${id}`,
           jobTitle: member.role || "Kreator Digital",
           worksFor: {
             "@type": "Organization",
@@ -171,7 +171,7 @@ export default function TalentDetail() {
           </Link>
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-deep-purple font-black uppercase tracking-widest text-sm hover:translate-x-[-4px] transition-transform"
+            className="flex items-center gap-2 text-deep-purple font-black uppercase tracking-widest text-sm hover:translate-x-[-4px] transition-transform cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" /> Back to Kingdom
           </button>
@@ -271,14 +271,14 @@ export default function TalentDetail() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                <div className="mb-10">
-                  <span className="text-accent-purple font-black text-sm uppercase tracking-[0.3em] flex items-center gap-2 mb-4">
+                <div className="mb-8 md:mb-10 text-center lg:text-left">
+                  <span className="text-accent-purple font-black text-xs md:text-sm uppercase tracking-[0.3em] flex items-center justify-center lg:justify-start gap-2 mb-4">
                     <Sparkles className="w-4 h-4" /> Radiant Talent
                   </span>
-                  <h1 className="text-6xl md:text-7xl font-sans font-black text-deep-purple uppercase tracking-tighter leading-[0.9] mb-4">
+                  <h1 className="text-4xl sm:text-5xl md:text-7xl font-sans font-black text-deep-purple uppercase tracking-tighter leading-[1.1] md:leading-[0.9] mb-4">
                     {member.name}
                   </h1>
-                  <p className="text-2xl font-black text-accent-purple/80 uppercase tracking-widest italic">
+                  <p className="text-lg md:text-2xl font-black text-accent-purple/80 uppercase tracking-widest italic">
                     {member.role}
                   </p>
                 </div>

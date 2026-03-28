@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 
 const Home = lazy(() => import("./pages/Home"));
 const Gallery = lazy(() => import("./pages/Gallery"));
+const Talents = lazy(() => import("./pages/Talents"));
 const TalentDetail = lazy(() => import("./pages/TalentDetail"));
 
 function App() {
@@ -14,7 +15,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/gallery" element={<Gallery />} />
-          <Route path="/talent/:id" element={<TalentDetail />} />
+          <Route path="/talents" element={<Talents />} />
+          <Route path="/talents/:id" element={<TalentDetail />} />
         </Routes>
       </Suspense>
       <SpeedInsights />

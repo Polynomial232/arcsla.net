@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 export interface TeamMember {
   id: string;
+  username?: string;
   name: string;
   role: string;
   image: string;
@@ -33,8 +34,8 @@ export default function TeamShowcase({ members }: TeamShowcaseProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleMemberClick = (id: string) => {
-    navigate(`/talent/${id}`);
+  const handleMemberClick = (member: TeamMember) => {
+    navigate(`/talents/${member.id}`);
   };
 
   const col1 = members.filter((_, i) => i % 3 === 0);
@@ -54,7 +55,7 @@ export default function TeamShowcase({ members }: TeamShowcaseProps) {
               className="w-[110px] h-[120px] sm:w-[130px] sm:h-[140px] md:w-[155px] md:h-[165px]"
               hoveredId={hoveredId}
               onHover={setHoveredId}
-              onClick={() => handleMemberClick(member.id)}
+              onClick={() => handleMemberClick(member)}
             />
           ))}
         </div>
@@ -68,7 +69,7 @@ export default function TeamShowcase({ members }: TeamShowcaseProps) {
               className="w-[122px] h-[132px] sm:w-[145px] sm:h-[155px] md:w-[172px] md:h-[182px]"
               hoveredId={hoveredId}
               onHover={setHoveredId}
-              onClick={() => handleMemberClick(member.id)}
+              onClick={() => handleMemberClick(member)}
             />
           ))}
         </div>
@@ -82,7 +83,7 @@ export default function TeamShowcase({ members }: TeamShowcaseProps) {
               className="w-[115px] h-[125px] sm:w-[136px] sm:h-[146px] md:w-[162px] md:h-[172px]"
               hoveredId={hoveredId}
               onHover={setHoveredId}
-              onClick={() => handleMemberClick(member.id)}
+              onClick={() => handleMemberClick(member)}
             />
           ))}
         </div>
@@ -96,7 +97,7 @@ export default function TeamShowcase({ members }: TeamShowcaseProps) {
             member={member}
             hoveredId={hoveredId}
             onHover={setHoveredId}
-            onClick={() => handleMemberClick(member.id)}
+            onClick={() => handleMemberClick(member)}
           />
         ))}
       </div>

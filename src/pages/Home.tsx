@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import {
   Menu,
   X,
@@ -119,6 +119,13 @@ const Navbar = ({ navLinks }: { navLinks: any[] }) => {
             </a>
           ))}
           <Link
+            to="/talents"
+            onClick={() => window.scrollTo(0, 0)}
+            className="text-sm font-medium text-foreground/80 hover:text-deep-purple transition-colors uppercase tracking-widest flex items-center gap-2"
+          >
+            <Crown className="w-4 h-4" /> Talents
+          </Link>
+          <Link
             to="/gallery"
             onClick={() => window.scrollTo(0, 0)}
             className="text-sm font-medium text-foreground/80 hover:text-deep-purple transition-colors uppercase tracking-widest flex items-center gap-2"
@@ -210,9 +217,15 @@ export default function Home() {
   } = useSupabaseData();
   const joinSectionRef = useRef(null);
 
-  const { scrollYProgress: joinScrollY } = useScroll({
+  const { scrollYProgress: joinScrollYRaw } = useScroll({
     target: joinSectionRef,
     offset: ["start end", "end start"],
+  });
+
+  const joinScrollY = useSpring(joinScrollYRaw, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
   });
 
   const joinBackgroundY = useTransform(joinScrollY, [0, 1], ["-15%", "15%"]);
@@ -442,7 +455,7 @@ export default function Home() {
               width="100%"
               height="380"
               frameBorder="0"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; compute-pressure"
               loading="lazy"
               title="Spotify Artist Embed"
               className="grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
@@ -568,7 +581,7 @@ export default function Home() {
                   src={`https://www.youtube.com/embed/${id}`}
                   title="YouTube video player"
                   frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; compute-pressure"
                   allowFullScreen
                 />
               </div>
